@@ -31,16 +31,23 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build APK (split per ABI)
-        run: flutter build apk --release --split-per-abi
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+        continue-on-error: true
+
+      - name: Build APK arm64
+        run: flutter build apk --release --target-platform android-arm64
 
       - name: Build Universal APK
         run: flutter build apk --release
 
+      - name: List APK output
+        run: ls -lh build/app/outputs/flutter-apk/
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: APKs
+          name: Apple-Music-APKs
           path: |
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
             build/app/outputs/flutter-apk/app-release.apk
@@ -49,22 +56,30 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "v1.0.${{ github.run_number }}"
-          name: "Apple Music Clone v1.0.${{ github.run_number }}"
+          name: "🎵 Apple Music Clone v1.0.${{ github.run_number }}"
           body: |
-            ## Apple Music Clone for Android
+            ## 🎵 Apple Music Clone for Android
 
-            ### Download the right APK for your device:
-            - **app-arm64-v8a-release.apk** → Most modern Android phones (recommended)
-            - **app-release.apk** → Universal (works on all devices)
+            ### 📲 Download APK:
+            | File | Device |
+            |------|--------|
+            | **app-arm64-v8a-release.apk** | Most modern Android phones ✅ (Recommended) |
+            | **app-release.apk** | Universal - works on all Android devices |
 
-            ### Features:
-            - iOS Apple Music UI with Liquid Glass effects
-            - Dynamic blurred background based on album art
-            - Rotating album art animation
-            - Full local music library support
-            - Mini player with frosted glass effect
-            - Shuffle & repeat modes
-            - Search across your library
+            ### ✨ Features:
+            - 🎨 Dynamic blurred background matching album art colors
+            - 💿 Rotating album art animation when playing
+            - 🎵 Full local music library (reads from your device)
+            - 🔍 Search songs, artists, albums
+            - 🔀 Shuffle & repeat modes
+            - ❤️ Like songs
+            - 📱 Mini player with frosted glass effect
+            - 🌙 Dark theme like iOS Apple Music
+
+            ### 📋 Install:
+            1. Download the APK
+            2. Enable "Install from unknown sources" in your Android settings
+            3. Open the APK and install
           files: |
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
             build/app/outputs/flutter-apk/app-release.apk
