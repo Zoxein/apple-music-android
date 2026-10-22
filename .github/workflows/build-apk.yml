@@ -31,11 +31,14 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Patch legacy plugins for AGP 8
+      - name: Patch legacy plugins for AGP 8 & Java 17
         run: |
           for f in $(find /home/runner/.pub-cache -name "build.gradle" -path "*/on_audio_query_android*/*"); do
             echo "Patching $f"
             sed -i '/android {/a \    namespace "com.lucasjosino.on_audio_query"' "$f"
+            sed -i 's/JavaVersion.VERSION_1_8/JavaVersion.VERSION_17/g' "$f"
+            sed -i "s/jvmTarget = '1.8'/jvmTarget = '17'/g" "$f"
+            sed -i 's/jvmTarget = "1.8"/jvmTarget = "17"/g' "$f"
           done
           for m in $(find /home/runner/.pub-cache -name "AndroidManifest.xml" -path "*/on_audio_query_android*/*"); do
             echo "Patching manifest $m"
