@@ -13,24 +13,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty('android')) {
-            project.android {
-                if (namespace == null) {
-                    if (project.name == 'on_audio_query_android') {
-                        namespace = 'com.lucasjosino.on_audio_query'
-                    } else if (project.group != null && project.group.toString().trim().length() > 0) {
-                        namespace = project.group.toString()
-                    } else {
-                        namespace = "com.devigner.${project.name.replace('-', '_')}"
-                    }
-                }
-            }
-        }
-    }
-}
-
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
