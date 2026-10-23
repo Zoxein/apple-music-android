@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/music_provider.dart';
 import '../theme/app_theme.dart';
@@ -43,7 +43,7 @@ class HomeScreen extends StatelessWidget {
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.person_circle_outlined,
+                icon: const Icon(Icons.account_circle_rounded,
                     color: AppColors.accent, size: 28),
                 onPressed: () {},
               ),
