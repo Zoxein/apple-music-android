@@ -1,6 +1,6 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:on_audio_query/on_audio_query.dart' hide SongModel;
 import 'package:provider/provider.dart';
 import '../providers/music_provider.dart';
 import '../models/song_model.dart';
@@ -416,7 +416,7 @@ class _ArtistsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Set<String> artists = provider.songs.map((s) => s.artist).toSet();
+    final Set<String> artists = provider.songs.map((s) => s.artist as String).toSet();
     final sortedArtists = artists.toList()..sort();
 
     if (sortedArtists.isEmpty) {
