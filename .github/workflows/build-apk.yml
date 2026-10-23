@@ -1,4 +1,4 @@
-name: Build & Release APK
+﻿name: Build & Release APK
 
 on:
   push:
@@ -31,75 +31,8 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Patch on_audio_query_android for AGP8 + Java17
-        run: |
-          PKG_DIR=$(find /home/runner/.pub-cache -type d -name "on_audio_query_android-*" 2>/dev/null | head -1)
-          if [ -n "$PKG_DIR" ]; then
-            echo "Found package at: $PKG_DIR"
-            BUILD_GRADLE="$PKG_DIR/android/build.gradle"
-            MANIFEST="$PKG_DIR/android/src/main/AndroidManifest.xml"
-            
-            # Rewrite build.gradle completely
-            cat > "$BUILD_GRADLE" << 'GRADLE_EOF'
-group 'com.lucasjosino.on_audio_query'
-version '1.0-SNAPSHOT'
-
-buildscript {
-    ext.kotlin_version = '1.9.0'
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-rootProject.allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-
-android {
-    namespace 'com.lucasjosino.on_audio_query'
-    compileSdkVersion 34
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-
-    defaultConfig {
-        minSdkVersion 21
-    }
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.google.code.gson:gson:2.10.1'
-}
-GRADLE_EOF
-            echo "Rewrote $BUILD_GRADLE"
-            
-            # Remove package attribute from manifest
-            if [ -f "$MANIFEST" ]; then
-              sed -i 's/ package="com.lucasjosino.on_audio_query"//g' "$MANIFEST"
-              echo "Patched $MANIFEST"
-            fi
-          else
-            echo "Package not found in pub cache!"
-            find /home/runner/.pub-cache -name "on_audio_query*" -type d 2>/dev/null
-          fi
+      - name: Patch on_audio_query for AGP8 + Java17
+        run: python3 patch_plugin.py
 
       - name: Build Universal APK
         run: flutter build apk --release
@@ -120,29 +53,16 @@ GRADLE_EOF
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "v1.0.${{ github.run_number }}"
-          name: "🎵 Apple Music Clone v1.0.${{ github.run_number }}"
+          name: "Apple Music Clone v1.0.${{ github.run_number }}"
           body: |
-            ## 🎵 Apple Music Clone for Android
+            ## Apple Music Clone for Android
 
-            ### 📲 دانلود فایل‌های APK:
-            | فایل | دستگاه هدف |
-            |------|------------|
-            | **app-arm64-v8a-release.apk** | اکثر گوشی‌های مدرن اندروید (پیشنهادی) |
-            | **app-release.apk** | نسخه یونیورسال (سازگار با همه گوشی‌ها) |
+            Download APK files below - install and enjoy!
 
-            ### ✨ قابلیت‌ها:
-            - 🎨 رابط کاربری مشابه Apple Music در iOS با افکت‌های بلور شیشه‌ای
-            - 💿 انیمیشن چرخشی کاور آلبوم هنگام پخش موسیقی
-            - 🎶 دسترسی به تمام آهنگ‌های محلی ذخیره شده روی گوشی
-            - 🔍 جستجو در بین آهنگ‌ها، خواننده‌ها و آلبوم‌ها
-            - 🔀 حالت‌های Shuffle و Repeat
-            - 📱 مینی‌پلیر شیشه‌ای (Frosted Glass) در پایین صفحه
-            - 🌙 تم تیره اختصاصی iOS
+            - app-arm64-v8a-release.apk -> Recommended for most modern phones
+            - app-release.apk -> Universal (all devices)
 
-            ### 📋 نحوه نصب:
-            1. فایل APK را دانلود کنید.
-            2. در تنظیمات گوشی اجازه نصب از منابع ناشناس (Unknown Sources) را بدهید.
-            3. فایل را باز کرده و نصب کنید.
+            Install: enable Unknown Sources in Android settings, then open the APK.
           files: build/app/outputs/flutter-apk/*.apk
           draft: false
           prerelease: false
